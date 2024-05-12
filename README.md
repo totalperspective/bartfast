@@ -255,95 +255,117 @@ Here, `{ListTermName}` represents a list of instances or values associated with 
 Bartfast uses a structured language to define tokens and principles that guide the design process. Here is an example of how color principles are integrated:
 
 ```clj
-language Colour
+language Colour {
   :intro "Defines color design principles and tokens for creating cohesive and accessible digital environments."
   :detail "Colour is a comprehensive framework designed for the creation and management of visual design elements. It encapsulates principles and tokens to address aesthetic harmony, accessibility, and usability within digital products."
 
-  token Value
+  token Value {
     :summary "Defines the spectrum of colors used in UI elements and backgrounds."
     :detail "Value is a fundamental token in the Colour framework. It represents the range of visual colors used across the design system, ensuring a cohesive visual experience."
+  }
 
-  principle Harmony
+  principle Harmony {
     :intro "Principle focusing on harmonious color combinations."
     :summary "Provides rules for combining colors to create visually appealing palettes."
-    relation complements[Value, Value]
+    relation complements[Value, Value] {
       :intro "Defines complementary color pairs."
       :detail "Complementary colors are pairs of colors that, when combined, cancel each other out, creating a neutral color."
-    relation analogous[Value, Value]
+    }
+    relation analogous[Value, Value] {
       :intro "Defines analogous color pairs."
       :detail "Analogous colors are colors that are adjacent to each other on the color wheel"
-    relation triadic[Value, Value, Value]
+    }
+    relation triadic[Value, Value, Value] {
       :intro "Defines combinations of triadic colors."
       :detail "Triadic colors are sets of three colors that are evenly spaced around the color wheel, creating balanced and vibrant color schemes."
-    relation splitComplementary[Value, [Value, Value]]
+    }
+    relation splitComplementary[Value, [Value, Value]] {
       :intro "Defines combinations of split complementary colors."
       :detail "Split complementary colors are pairs of colors that are adjacent to a complementary color, providing both contrast and harmony."
       complements -> $Object, $Subject*
+    }
+ }
 
-  principle Context
+  principle Context {
     :intro "Principle focusing on the context of color perception."
     :summary "Considers environmental factors affecting color perception."
     relation contrastEnhancement[Value, Value]
     relation environmentImpact[Value, Value]
+  }
 
-  principle Theory
+  principle Theory {
     :intro "Color theory principles for harmonious color combinations."
     :summary "Guides aesthetically pleasing color combinations."
     require Harmony
     require Context
-
-  principle HighContrast
+  }
+  principle HighContrast {
     :summary "Enhances interface accessibility by providing sufficient contrast between foreground and background elements."
     :detail "HighContrast focuses on enhancing the visual accessibility of interfaces by ensuring a sufficient contrast ratio between foreground and background elements."
-    term Foreground[Value]
+    term Foreground[Value] {
       :summary "Specifies the color used for critical interactive elements like text and icons."
-    term Background[Value]
+    }
+    term Background[Value] {
       :summary "Specifies the color used for larger background areas, ensuring they contrast effectively with foreground elements."
+    }
     as [Foreground, Background]
-    relation highContrast[Foreground, Background]
+    relation highContrast[Foreground, Background] {
       :summary "Verifies that the chosen foreground and background colors meet accessibility standards for contrast."
-
-  principle ColorBlindSafe
+    }
+  }
+  principle ColorBlindSafe {
       :summary "Optimizes color selections to be distinguishable by users with color vision deficiencies."
       :detail "ColorBlindSafe enhances usability for users with color vision deficiencies by optimizing color choices that are distinguishable across various types of color blindness."
-    term Foreground[Value]
+    term Foreground[Value] {
       :summary "Color designated for important UI components requiring immediate attention."
-    term Background[Value]
+    }
+    term Background[Value] {
       :summary "Color used for less interactive elements that must still be visible."
+    }
     as [Foreground, Background]
-    relation colorBlindSafe[Foreground, Background]
+    relation colorBlindSafe[Foreground, Background] {
       :summary "Confirms that foreground and background colors are perceptible by users with different types of color blindness."
-
-  principle Accessibility
-      :summary "Combines HighContrast and ColorBlindSafe principles to accommodate a wider range of visual abilities."
-      :detail "Accessibility combines the HighContrast and ColorBlindSafe principles to form a comprehensive approach to visual accessibility, ensuring that all users can navigate and understand interfaces effectively."
+    }
+  }
+  principle Accessibility {
+    :summary "Combines HighContrast and ColorBlindSafe principles to accommodate a wider range of visual abilities."
+    :detail "Accessibility combines the HighContrast and ColorBlindSafe principles to form a comprehensive approach to visual accessibility, ensuring that all users can navigate and understand interfaces effectively."
     require HighContrast
     require ColorBlindSafe
+  }
 
-  principle Theme
+  principle Theme {
     :summary "Establishes essential color guidelines for user interfaces."
     :detail "Theme sets foundational color guidelines to create coherent and aesthetically pleasing user interfaces."
-    term Background[Value]
+
+    term Background[Value] {
       :summary "Main color for interface backgrounds."
-    term Text[Value]
+    }
+    term Text[Value] {
       :summary "Color for all text elements to ensure readability."
-    term Primary[Value]
+      }
+    term Primary[Value] {
       :summary "Dominant color used for primary actions and highlights."
-    term Secondary[Value]
+    }
+    term Secondary[Value] {
       :summary "Supplementary color that supports the primary palette."
-    apply Accessibility.Theory
+    }
+    apply Accessibility.Theory {
       complements -> Primary, Secondary
       analogous -> Primary, Background
       triadic -> Primary, Secondary, Text
       splitComplementary -> Primary, Secondary, Background
-
-    apply Accessibility
+    }
+    apply Accessibility {
       :doc "Applies color accessibility principles to ensure readability and usability."
-      HighContrast[Text, Background]
+      HighContrast -> Text, Background {
         :doc "Ensures sufficient contrast between text and background colors."
-      ColorBlindSafe[Primary, Secondary]
+      }
+      ColorBlindSafe -> Primary, Secondary {
         :doc "Optimizes color choices for users with color vision deficiencies."
-
+      }
+    }
+  }
   token Name
     :summary "Identifies specific colors within the design system for consistent application."
     :detail "Name serves as a naming convention for systematic use within the design system. Each Name is associated with a specific color defined under the Value token, promoting consistency throughout the design elements."
@@ -351,10 +373,11 @@ language Colour
   token Palette
     :summary "Organizes a set of named colors to ensure consistency across UI components."
     :detail "Palette serves as a structured repository within the Colour framework, systematically organizing a collection of named colors. This token facilitates the consistent application of color across various design elements, maintaining coherence and supporting thematic consistency."
-    term [Name][Value]
+    term [Name][Value] {
       :summary "This mapping defines specific visual colors associated with named color identifiers within the design system. Each entry in the Palette represents a named color that is directly linked to a defined visual color in the Value token, ensuring consistency across the design system."
+    }
     satisfies Theory
-
+}
 ```
 
 ## Example Theme Instances
@@ -362,11 +385,11 @@ language Colour
 To demonstrate how Bartfast can be applied to define specific themes within a design system, consider the following examples:
 
 ```clj
-specify MyBrand
+specify MyBrand {
   :intro "This file defines a color palette and themes using the Colour DSL."
   use Colour
 
-  myPalette <- Colour.Palette
+  myPalette <- Colour.Palette {
     :intro "Defines a palette of colors for the design language."
     :detail "The palette includes a range of colors to be used consistently throughout the design system."
     White -> #FFFFFF
@@ -381,28 +404,32 @@ specify MyBrand
     Orange -> #FFA500
     Purple -> #800080
     Pink -> #FFC0CB
-    apply Colour.Theory.Harmony
+    apply Colour.Theory.Harmony {
       :intro "Complementary colours"
       complements -> Blue, Orange
       complements -> Red, Green
       complements -> Orange, Purple
-    apply Colour.Theory.Harmony
+    }
+    apply Colour.Theory.Harmony {
       :intro "Analogous colours"
       analogous -> Blue, LightBlue
       analogous -> Red, Yellow
       analogous -> Orange, Yellow
       analogous -> Purple, Pink
-    apply ColorTheory.Harmony
+    }
+    apply ColorTheory.Harmony {
       :intro "Triadic colours"
       triadic -> Red, Green, Blue
       triadic -> Green, Blue, Yellow
       triadic -> Purple, Pink, Orange
-    apply ColorTheory.Harmony
+    }
+    apply ColorTheory.Harmony {
       :intro "Split complementary colours"
       splitComplementary -> Green, LightBlue, Red
       splitComplementary -> Yellow, Blue, Red
       splitComplementary -> Pink, Yellow, Red
-    apply ColorTheory.Context
+    }
+    apply ColorTheory.Context {
       :intro "Contextual colours"
       contrastEnhancement -> White, Black
       environmentImpact -> Grey, DarkGrey
@@ -411,23 +438,27 @@ specify MyBrand
       environmentImpact -> LightBlue, DarkGrey
       environmentImpact -> DarkGrey, White
       environmentImpact -> Black, LightBlue
+    }
+  }
 
-  LightTheme <- Colour.Theme
+  LightTheme <- Colour.Theme {
     :intro "Defines a light theme with specific color values."
     :detail "The light theme establishes a bright and airy visual style suitable for well-lit environments."
     Background -> myPalette.White
     Text -> myPalette.DarkGrey
     Primary -> myPalette.Blue
     Secondary -> myPalette.LightBlue
+  }
 
-  DarkTheme <- Colour.Theme
+  DarkTheme <- Colour.Theme {
     :intro "Defines a dark theme with specific color values."
     :detail "The dark theme creates a sleek and modern visual style ideal for low-light environments."
     Background -> myPalette.DarkGrey
     Text -> myPalette.White
     Primary -> myPalette.Red
     Secondary -> myPalette.Green
-
+  }
+}
 ```
 
 ## Conclusion

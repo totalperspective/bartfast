@@ -1,18 +1,142 @@
 grammar Slarti
 
 entry Model:
-    (persons+=Person | greetings+=Greeting)*;
+    elements+=Element*
+;
 
-Person:
-    'person' name=ID;
+Element:
+    Language | Token | Principle | Specification | Use | Instance
+;
 
-Greeting:
-    'Hello' person=[Person:ID] '!';
+Language:
+    'language' name=ID
+    ( '{' (metadata+=Metadata | tokens+=Token | principles+=Principle)* '}' )?
+;
 
-hidden terminal WS: /\s+/;
+Token:
+    'token' name=ID
+    ( '{' (metadata+=Metadata | terms+=Term | satisfies+=PrincipleReference)* '}' )?
+;
+
+Principle:
+    'principle' name=ID
+    ( '{' (metadata+=Metadata | terms+=Term | relations+=Relation | as=AsRelation | applies+=Apply)* '}' )?
+;
+
+Term:
+    'term' name=ID
+    definition=TermDefinition
+    ( '{' (metadata+=Metadata)* '}' )?
+;
+
+TermDefinition:
+    BasicTerm | UnionTerm | ListTerm | TupleTerm
+;
+
+BasicTerm:
+    type=QualifiedName
+;
+
+UnionTerm:
+    types+=QualifiedName ('|' types+=QualifiedName)+
+;
+
+ListTerm:
+    '[' type=QualifiedName '...' ']'
+;
+
+TupleTerm:
+    '[' types+=QualifiedName (',' types+=QualifiedName)+ ']'
+;
+
+Relation:
+    'relation' name=ID '[' subject=ExtendedTerm<false> ',' object=ExtendedTerm<false> ']'
+    ( '{' (subRelations+=SubRelation | metadata+=Metadata)* '}' )?
+;
+
+SubRelation infers Application:
+    relation=ID '->' subject=ExtendedTerm<true> ',' object=ExtendedTerm<true>
+;
+
+ExtendedTerm<isShadow>:
+    (<isShadow> term=ShadowName | term=QualifiedName) index=IndexSuffix?
+;
+
+ShadowName returns string:
+    '$' ('Object' | 'Subject')
+;
+
+IndexSuffix:
+    '/' index=(INT | '*')
+;
+
+AsRelation:
+    'as' '[' subject=QualifiedName ',' object=QualifiedName ']'
+    ( '{' (metadata+=Metadata)* '}' )?
+;
+
+Apply:
+    'apply' principle=QualifiedName
+    ( '{' (applications+=Application | metadata+=Metadata)* '}' )?
+;
+
+Application:
+    relation=QualifiedName '->' subject=ExtendedTerm<false> ',' object=ExtendedTerm<false>
+;
+
+Specification:
+    'specify' name=ID
+    ( '{' (metadata+=Metadata | uses+=Use | instances+=Instance | applies+=Apply)* '}' )?
+;
+
+Use:
+    'use' language=QualifiedName
+;
+
+Instance:
+    name=ID '<-' token=QualifiedName
+    ( '{' (metadata+=Metadata | bindings+=Binding | applies+=Apply)* '}' )?
+;
+
+Binding:
+    term=ID '->' value=Value
+;
+
+Metadata:
+    ':' key=ID value=STRING
+;
+
+PrincipleReference:
+    'satisfies' principle=QualifiedName
+;
+
+TaggedLiteral:
+    '#' tag=ID literal=Literal
+;
+
+Value:
+    Literal | TaggedLiteral
+;
+
+QualifiedName returns string:
+    ID ('.' ID)*
+;
+
+Literal:
+    value=(INT | STRING) | Vector | BOOLEAN | 'null'
+;
+
+fragment Vector:
+    '[' value+=Literal (',' value+=Literal)* ']'
+;
+
+fragment BOOLEAN:
+    value?='true' | 'false'
+;
+
 terminal ID: /[_a-zA-Z][\w_]*/;
 terminal INT returns number: /[0-9]+/;
 terminal STRING: /"(\\.|[^"\\])*"|'(\\.|[^'\\])*'/;
 
-hidden terminal ML_COMMENT: /\/\*[\s\S]*?\*\//;
-hidden terminal SL_COMMENT: /\/\/[^\n\r]*/;
+hidden terminal SL_COMMENT: /;[^\n\r]*/;
+hidden terminal WS: /\s{2,}/;
