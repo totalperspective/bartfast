@@ -8,6 +8,11 @@ Element:
     Language | Token | Principle | Specification | Use | Instance
 ;
 
+type Namespace =  Language | Token | Principle | Specification;
+type Named = Namespace | Term | Relation |  Instance
+type TermOrToken = Term | Token
+type Meta = Named | AsRelation | Apply
+
 Language:
     'language' name=ID
     ( '{' (metadata+=Metadata | tokens+=Token | principles+=Principle)* '}' )?
@@ -34,36 +39,56 @@ TermDefinition:
 ;
 
 BasicTerm:
-    type=QualifiedName
+    type=[Token:QualifiedName]
 ;
 
 UnionTerm:
-    types+=QualifiedName ('|' types+=QualifiedName)+
+    types+=[Token:QualifiedName] ('|' types+=[Token:QualifiedName])+
 ;
 
 ListTerm:
-    '[' type=QualifiedName '...' ']'
+    '[' type=[Token:QualifiedName] '...' ']'
 ;
 
 TupleTerm:
-    '[' types+=QualifiedName (',' types+=QualifiedName)+ ']'
+    '[' types+=[Token:QualifiedName] (',' types+=[Token:QualifiedName])+ ']'
 ;
 
 Relation:
-    'relation' name=ID '[' subject=ExtendedTerm<false, false> ',' object=ExtendedTerm<false, true> ']'
+    'relation' name=ID '[' subject=TermRef ',' object=RelationTerms ']'
     ( '{' (subRelations+=SubRelation | metadata+=Metadata)* '}' )?
 ;
 
 SubRelation infers Application:
-    relation=ID '->' subject=ExtendedTerm<true, false> ',' object=ExtendedTerm<true, false>
+    relation=[Relation:ID] '->' subject=SubRelationSubject ',' object=SubRelationObject
 ;
 
-ExtendedTerm<isShadow, allowTuples>:
-    (<isShadow> term=ShadowName | term=QualifiedName | <allowTuples> term=TermTuple) index=IndexSuffix?
+RelationTerms:
+    (TermRef index=IndexSuffix?) | TermTuple
+;
+
+SubRelationSubject:
+    (TermRef | ShadowTerm) index=IndexSuffix?
+;
+
+SubRelationObject:
+    ShadowTermTuple | SubRelationSubject
+;
+
+TermRef:
+    term=[TermOrToken:QualifiedName]
+;
+
+ShadowTerm:
+    term=[Term:ShadowName]
 ;
 
 TermTuple:
-    '[' terms+=QualifiedName (',' terms+=QualifiedName)* ']'
+    '[' terms+=TermRef (',' terms+=TermRef)* ']'
+;
+
+ShadowTermTuple:
+    '[' terms+=SubRelationSubject (',' terms+=SubRelationSubject)* ']'
 ;
 
 ShadowName returns string:
@@ -75,17 +100,17 @@ IndexSuffix:
 ;
 
 AsRelation:
-    'as' '[' subject=QualifiedName ',' object=QualifiedName ']'
+    'as' '[' subject=[TermOrToken:QualifiedName] ',' object=[TermOrToken:QualifiedName] ']'
     ( '{' (metadata+=Metadata)* '}' )?
 ;
 
 Apply:
-    'apply' principle=QualifiedName
+    'apply' principle=[Principle:QualifiedName]
     ( '{' (applications+=Application | metadata+=Metadata)* '}' )?
 ;
 
 Application:
-    relation=QualifiedName '->' subject=ExtendedTerm<false, false> ',' object=ExtendedTerm<false, false>
+    relation=[Relation:QualifiedName] '->' subject=TermRef ',' object=RelationTerms
 ;
 
 Specification:
@@ -94,16 +119,16 @@ Specification:
 ;
 
 Use:
-    'use' language=QualifiedName
+    'use' language=[Language:QualifiedName]
 ;
 
 Instance:
-    name=ID '<-' token=QualifiedName
+    name=ID '<-' token=[Token:QualifiedName]
     ( '{' (metadata+=Metadata | bindings+=Binding | applies+=Apply)* '}' )?
 ;
 
 Binding:
-    term=ID '->' value=Value
+    term=[Term:ID] '->' value=Value
 ;
 
 Metadata:
@@ -111,7 +136,7 @@ Metadata:
 ;
 
 PrincipleReference:
-    'satisfies' principle=QualifiedName
+    'satisfies' principle=[Principle:QualifiedName]
 ;
 
 TaggedLiteral:

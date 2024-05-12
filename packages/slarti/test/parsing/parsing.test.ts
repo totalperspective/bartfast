@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'vitest';
-import { EmptyFileSystem, type LangiumDocument } from 'langium';
+import { AstNode, EmptyFileSystem, type LangiumDocument } from 'langium';
 import { expandToString as s } from 'langium/generate';
 import { parseHelper } from 'langium/test';
 import { createSlartiServices } from '../../src/language/slarti-module.js';
@@ -49,6 +49,7 @@ const tests = [
         `,
         structure: s`
             Language(TokenLang):
+
               Tokens:
                 Token(ColorToken):
                   :summary "Represents basic color information"
@@ -66,8 +67,10 @@ const tests = [
         `,
         structure: s`
             Language(PrincipleLang):
+
               Principles:
                 Principle(Harmony):
+
                   Relations:
                     Relation(complements):
         `
@@ -87,8 +90,10 @@ const tests = [
     `,
     structure: s`
         Language(ComplexRelationLang):
+
           Principles:
             Principle(AdvancedColorTheory):
+
               Relations:
                 Relation(triadic):
                   :detail "Triadic relation for vibrant color schemes."
@@ -106,8 +111,10 @@ const tests = [
       `,
         structure: s`
         Language(Example):
+
           Tokens:
             Token(MyToken):
+
 
           Principles:
             Principle(MyPrinciple):
@@ -125,12 +132,16 @@ const tests = [
       `,
         structure: s`
         Language(AnotherExample):
+
           Tokens:
             Token(FirstToken):
+
             Token(SecondToken):
+
 
           Principles:
             Principle(FirstPrinciple):
+
             Principle(SecondPrinciple):
       `
     },
@@ -145,8 +156,10 @@ const tests = [
       `,
         structure: s`
         Language(NestedExample):
+
           Tokens:
             Token(OuterToken):
+
               Terms:
                 Term(InnerTerm):
       `
@@ -224,13 +237,16 @@ const tests = [
         `,
         structure: s`
             Specification(ComplexApplication):
+
               Uses:
                 Use(Colour):
 
               Instances:
                 Instance(myTheme):
+
                   Applies:
                     Apply(Colour.Theory.Harmony):
+
                     Apply(Colour.Theory.Context):
         `
     },
@@ -252,6 +268,7 @@ const tests = [
         `,
         structure: s`
             Specification(ThemeSpecification):
+
               Instances:
                 Instance(LightTheme):
                   :intro "Light theme specifications."
@@ -287,7 +304,7 @@ describe('AST structure tests', () => {
         const formattedAst = buildAstString(document.parseResult.value, services).trim();
 
         // Perform the structure comparison
-        expect(formattedAst).toBe(structure.trim());
+        expect(formattedAst).toBe((structure as string).trim());
     });
 });
 
@@ -305,7 +322,8 @@ function checkDocumentValid(document: LangiumDocument<Model>): string | undefine
         return "ParseResult is 'undefined'.";
     }
     if (!isModel(document.parseResult.value)) {
-        return `Root AST object is a ${document.parseResult.value.$type}, expected a 'Model'.`;
+        const node: AstNode = document.parseResult.value
+        return `Root AST object is a ${node.$type}, expected a 'Model'.`;
     }
     return undefined;
 }

@@ -1,4 +1,4 @@
-import { AstNode } from 'langium';
+import { AstNode, isNamed, isReference, Reference } from 'langium';
 import {
   isLanguage,
   isToken,
@@ -8,9 +8,9 @@ import {
   isInstance,
   isModel,
   isMetadata,
-  isElement,
   isApply,
   isBinding,
+  isMeta,
 } from '../../src/language/generated/ast.js';
 import { createSlartiServices } from '../../src/language/slarti-module.js';
 
@@ -28,17 +28,27 @@ export function buildAstString(
 ): string {
   const indent = ' '.repeat(depth * 2); // Adjust indentation level
 
-  function nodeName(node: AstNode) {
+  function nodeName(node: AstNode | Reference<AstNode>) {
+    if (isReference(node)) {
+      if (node.error) {
+        return node.$refText;
+      }
+      return nodeName(node.ref!);
+    }
     if (isApply(node)) {
-      return node.principle;
+      return nodeName(node.principle);
     }
     if (isUse(node)) {
-      return node.language;
+      return nodeName(node.language);
     }
     if (isBinding(node)) {
-      return node.term;
+      return nodeName(node.term);
     }
-    return node.name || '';
+
+    if (isNamed(node)) {
+      return node.name;
+    }
+    return '';
   }
   let result = !isModel(node)
     ? isMetadata(node)
@@ -53,7 +63,7 @@ export function buildAstString(
       .join('');
   };
 
-  if (node?.metadata?.length)
+  if (isMeta(node))
     result += `${processChildren(
       node.metadata,
       isLanguage(node) || isSpecification(node) ? 0 : 1
