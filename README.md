@@ -275,9 +275,10 @@ language Colour
     relation triadic[Value, Value, Value]
       :intro "Defines combinations of triadic colors."
       :detail "Triadic colors are sets of three colors that are evenly spaced around the color wheel, creating balanced and vibrant color schemes."
-    relation splitComplementary[Value, Value, Value]
+    relation splitComplementary[Value, [Value, Value]]
       :intro "Defines combinations of split complementary colors."
       :detail "Split complementary colors are pairs of colors that are adjacent to a complementary color, providing both contrast and harmony."
+      complements -> $Object, $Subject*
 
   principle Context
     :intro "Principle focusing on the context of color perception."

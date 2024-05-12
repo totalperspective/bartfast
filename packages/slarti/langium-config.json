@@ -1,0 +1,15 @@
+{
+    "projectName": "Slarti",
+    "languages": [{
+        "id": "slarti",
+        "grammar": "src/language/slarti.langium",
+        "fileExtensions": [".slarti"],
+        "textMate": {
+            "out": "syntaxes/slarti.tmLanguage.json"
+        },
+        "monarch": {
+            "out": "syntaxes/slarti.monarch.ts"
+        }
+    }],
+    "out": "src/language/generated"
+}
