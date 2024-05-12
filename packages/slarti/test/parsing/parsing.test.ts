@@ -80,11 +80,12 @@ const tests = [
             principle AdvancedColorTheory {
                 relation triadic[Value, [Value, Value]] {
                     :detail "Triadic relation for vibrant color schemes."
+                    shadow -> $Object, $Subject*
                 }
             }
         }
     `,
-    structure: `
+    structure: s`
         Language(ComplexRelationLang):
           Principles:
             Principle(AdvancedColorTheory):
@@ -258,7 +259,7 @@ const tests = [
                   Bindings:
                     Binding(Background):
                     Binding(Text):
-                    
+
                 Instance(DarkTheme):
                   :intro "Dark theme specifications."
 
@@ -281,7 +282,7 @@ describe('AST structure tests', () => {
             expect(validationError).toBeDefined();
             return
         }
-        expect(validationError).toBeUndefined();
+        expect(validationError || '').toBe('');
 
         const formattedAst = buildAstString(document.parseResult.value, services).trim();
 

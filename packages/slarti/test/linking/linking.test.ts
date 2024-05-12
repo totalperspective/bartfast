@@ -1,9 +1,9 @@
 import { afterEach, beforeAll, describe, expect, test } from "vitest";
-import { EmptyFileSystem, type LangiumDocument } from "langium";
+import { EmptyFileSystem, type LangiumDocument, AstNode } from "langium";
 import { expandToString as s } from "langium/generate";
 import { clearDocuments, parseHelper } from "langium/test";
 import { createSlartiServices } from "../../src/language/slarti-module.js";
-import { Model, isModel } from "../../src/language/generated/ast.js";
+import { Model, Token, isModel, isToken } from "../../src/language/generated/ast.js";
 
 let services: ReturnType<typeof createSlartiServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
@@ -23,10 +23,13 @@ afterEach(async () => {
 
 describe('Linking tests', () => {
 
-    test('linking of greetings', async () => {
+    test('linking of terms in tokens', async () => {
         document = await parse(`
-            person Langium
-            Hello Langium!
+            token Test
+
+            token TestTerm {
+                term Term Test
+            }
         `);
 
         expect(
@@ -35,9 +38,9 @@ describe('Linking tests', () => {
             // and then evaluate the cross references we're interested in by checking
             //  the referenced AST element as well as for a potential error message;
             checkDocumentValid(document)
-                || document.parseResult.value.greetings.map(g => g.person.ref?.name || g.person.error?.message).join('\n')
+                || document.parseResult.value.elements.map(g => isToken(g) ? g.name : '').join('\n')
         ).toBe(s`
-            Langium
+            
         `);
     });
 });

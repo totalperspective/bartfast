@@ -7,7 +7,7 @@ import { createSlartiServices } from "../../src/language/slarti-module.js";
 import { Model, isModel } from "../../src/language/generated/ast.js";
 
 let services: ReturnType<typeof createSlartiServices>;
-let parse:    ReturnType<typeof parseHelper<Model>>;
+let parse: ReturnType<typeof parseHelper<Model>>;
 let document: LangiumDocument<Model> | undefined;
 
 beforeAll(async () => {
@@ -19,25 +19,78 @@ beforeAll(async () => {
     // await services.shared.workspace.WorkspaceManager.initializeWorkspace([]);
 });
 
-describe('Validating', () => {
-  
-    test('check no errors', async () => {
-        document = await parse(`
-            person Langium
-        `);
+const tests = [
+    {
+        name: 'check no errors Token Name',
+        code: `
+        token TestToken
+        `,
+        expected: {
+            length: 0
+        }
+    },
+    {
+        name: 'check capital letter validation Token Name',
+        code: `
+        token testToken
+        `,
+        expected: {
+            content: s`
+            [1:14..1:23]: Token name should start with a capital.
+        `
+        }
 
-        expect(
-            // here we first check for validity of the parsed document object by means of the reusable function
-            //  'checkDocumentValid()' to sort out (critical) typos first,
-            // and then evaluate the diagnostics by converting them into human readable strings;
-            // note that 'toHaveLength()' works for arrays and strings alike ;-)
-            checkDocumentValid(document) || document?.diagnostics?.map(diagnosticToString)?.join('\n')
-        ).toHaveLength(0);
+    },
+    {
+        name: 'check no errors Relation Name',
+        code: `
+        principle Test {
+            relation test[A,B]
+        }
+        `,
+        expected: {
+            length: 0
+        }
+    },
+    {
+        name: 'check capital letter validation Relation Name',
+        code: `
+        principle Test {
+            relation Test[A,B]
+        }
+        `,
+        expected: {
+            content: s`
+            [2:21..2:25]: Relation name should start with a non-capital.
+        `
+        }
+
+    }
+]
+describe('Validating', () => {
+
+    test.each(tests)('$description', async ({ code, expected: expected }) => {
+        document = await parse(code);
+
+        const result = checkDocumentValid(document) || document?.diagnostics?.map(diagnosticToString)?.join('\n')
+        for (const [type, expectation] of Object.entries(expected)) {
+            switch (type) {
+                case 'length':
+                    expect(result).toHaveLength(expectation);
+                    break;
+                case 'content':
+                    expect(result).toEqual(
+                        // 'expect.stringContaining()' makes our test robust against future additions of further validation rules
+                        expect.stringContaining(expectation)
+                    )
+                    break;
+            }
+        }
     });
 
     test('check capital letter validation', async () => {
         document = await parse(`
-            person langium
+            token testToken
         `);
 
         expect(
@@ -45,7 +98,7 @@ describe('Validating', () => {
         ).toEqual(
             // 'expect.stringContaining()' makes our test robust against future additions of further validation rules
             expect.stringContaining(s`
-                [1:19..1:26]: Person name should start with a capital.
+                [1:18..1:27]: Token name should start with a capital.
             `)
         );
     });

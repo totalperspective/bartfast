@@ -50,16 +50,20 @@ TupleTerm:
 ;
 
 Relation:
-    'relation' name=ID '[' subject=ExtendedTerm<false> ',' object=ExtendedTerm<false> ']'
+    'relation' name=ID '[' subject=ExtendedTerm<false, false> ',' object=ExtendedTerm<false, true> ']'
     ( '{' (subRelations+=SubRelation | metadata+=Metadata)* '}' )?
 ;
 
 SubRelation infers Application:
-    relation=ID '->' subject=ExtendedTerm<true> ',' object=ExtendedTerm<true>
+    relation=ID '->' subject=ExtendedTerm<true, false> ',' object=ExtendedTerm<true, false>
 ;
 
-ExtendedTerm<isShadow>:
-    (<isShadow> term=ShadowName | term=QualifiedName) index=IndexSuffix?
+ExtendedTerm<isShadow, allowTuples>:
+    (<isShadow> term=ShadowName | term=QualifiedName | <allowTuples> term=TermTuple) index=IndexSuffix?
+;
+
+TermTuple:
+    '[' terms+=QualifiedName (',' terms+=QualifiedName)* ']'
 ;
 
 ShadowName returns string:
@@ -67,7 +71,7 @@ ShadowName returns string:
 ;
 
 IndexSuffix:
-    '/' index=(INT | '*')
+    ('/' index=INT) | index='*'
 ;
 
 AsRelation:
@@ -81,7 +85,7 @@ Apply:
 ;
 
 Application:
-    relation=QualifiedName '->' subject=ExtendedTerm<false> ',' object=ExtendedTerm<false>
+    relation=QualifiedName '->' subject=ExtendedTerm<false, false> ',' object=ExtendedTerm<false, false>
 ;
 
 Specification:
@@ -139,4 +143,4 @@ terminal INT returns number: /[0-9]+/;
 terminal STRING: /"(\\.|[^"\\])*"|'(\\.|[^'\\])*'/;
 
 hidden terminal SL_COMMENT: /;[^\n\r]*/;
-hidden terminal WS: /\s{2,}/;
+hidden terminal WS: /\s+/;

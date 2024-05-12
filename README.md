@@ -354,7 +354,7 @@ language Colour {
       complements -> Primary, Secondary
       analogous -> Primary, Background
       triadic -> Primary, Secondary, Text
-      splitComplementary -> Primary, Secondary, Background
+      splitComplementary -> Background, [Secondary, Primary]
     }
     apply Accessibility {
       :doc "Applies color accessibility principles to ensure readability and usability."
