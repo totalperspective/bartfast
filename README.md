@@ -1,5 +1,13 @@
 # Bartfast
 
+[![npm package][npm-img]][npm-url]
+[![Build Status][build-img]][build-url]
+[![Downloads][downloads-img]][downloads-url]
+[![Issues][issues-img]][issues-url]
+[![Code Coverage][codecov-img]][codecov-url]
+[![Commitizen Friendly][commitizen-img]][commitizen-url]
+[![Semantic Release][semantic-release-img]][semantic-release-url]
+
 ## Introduction
 
 Bartfast is a design language builder inspired by Douglas Adams’ character Slartibartfast, a planet designer from the novel The Hitchhiker's Guide to the Galaxy. Much like Slartibartfast, who took immense pride in crafting detailed, award-winning coastlines, Bartfast aims to aid developers and designers in meticulously designing and refining their digital environments.
