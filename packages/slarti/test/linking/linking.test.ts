@@ -4,7 +4,7 @@ import { expandToString as s } from "langium/generate";
 import { clearDocuments, parseHelper } from "langium/test";
 import { createSlartiServices } from "../../src/language/slarti-module.js";
 import { Model, Token, isModel, isToken } from "../../src/language/generated/ast.js";
-import { nodeName, nodeNames } from "../parsing/string.js";
+import { nodeName, nodeNames } from "../string.js";
 
 let services: ReturnType<typeof createSlartiServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
@@ -22,16 +22,48 @@ afterEach(async () => {
     document && clearDocuments(services.shared, [ document ]);
 });
 
+const tests = [
+    {
+        name: 'terms in tokens',
+        code: `
+        token Test
+
+        token TestTerm {
+            term Term Test
+        }
+        `,
+        expectation: s`
+        Test
+        TestTerm[Term[->Test]]
+    `
+    },
+    {
+        name: 'applying a principle',
+        code: `
+        token T
+        principle P1 {
+            relation test[T,T]
+        }
+
+        principle P2 {
+            term T1 T
+            apply P1 {
+                test -> T, T1
+            }
+        }
+        `,
+        expectation: s`
+        T
+        P1[test[->T, ->T]]
+        P2[T1[->T], T2[->T], [->P1, [->test. [->T], [->T1]]]]
+    `
+    }
+]
+
 describe('Linking tests', () => {
 
-    test('linking of terms in tokens', async () => {
-        document = await parse(`
-            token Test
-
-            token TestTerm {
-                term Term Test
-            }
-        `);
+    test.each(tests)('linking of $name', async ({ code, expectation}) => {
+        document = await parse(code);
 
         expect(
             // here we first check for validity of the parsed document object by means of the reusable function
@@ -40,10 +72,7 @@ describe('Linking tests', () => {
             //  the referenced AST element as well as for a potential error message;
             checkDocumentValid(document)
                 || document.parseResult.value.elements.map(n => nodeNames(n, true)).join('\n')
-        ).toBe(s`
-            Test
-            TestTerm[Term[->Test]]
-        `);
+        ).toBe(expectation);
     });
 });
 

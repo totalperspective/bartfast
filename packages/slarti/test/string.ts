@@ -11,16 +11,18 @@ import {
   isApply,
   isBinding,
   isMeta,
-  Named,
   isTerm,
-  isBasicTerm,
   isTermDefinition,
-} from '../../src/language/generated/ast.js';
-import { createSlartiServices } from '../../src/language/slarti-module.js';
+  isRelation,
+  isTermRef,
+  isApplication,
+  NamedOrRefed,
+} from '../src/language/generated/ast.js';
+import { createSlartiServices } from '../src/language/slarti-module.js';
 
 export function getNamedElements(
   container: AstNode | Reference<AstNode>
-): (Named | Reference<Named>)[] {
+): (NamedOrRefed | Reference<NamedOrRefed>)[] {
   if (isReference(container)) {
     if (!container.ref) {
       return [];
@@ -36,7 +38,15 @@ export function getNamedElements(
   }
 
   if (isPrinciple(container)) {
-    return [...container.relations];
+    return [...container.terms, ...container.relations, ...container.applies];
+  }
+
+  if (isApply(container)) {
+    return [container.principle, ...container.applications];
+  }
+
+  if (isApplication(container)) {
+    return [container.relation, container.subject, container.object];
   }
 
   if (isToken(container)) {
@@ -53,6 +63,19 @@ export function getNamedElements(
   if (isTermDefinition(container)) {
     return [container.term.term];
   }
+
+  if (isRelation(container)) {
+    return [
+      ...getNamedElements(container.subject),
+      ...getNamedElements(container.object),
+      ...container.subRelations.flatMap(getNamedElements),
+    ];
+  }
+
+  if (isTermRef(container)) {
+    return [container.term];
+  }
+  console.warn(`Unhandled node type <${container.$type}>`);
   return [];
 }
 

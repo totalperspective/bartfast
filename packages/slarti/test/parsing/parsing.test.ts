@@ -5,7 +5,7 @@ import { expandToString as s } from 'langium/generate';
 import { parseHelper } from 'langium/test';
 import { createSlartiServices } from '../../src/language/slarti-module.js';
 import { Model, isModel } from '../../src/language/generated/ast.js';
-import { buildAstString } from './string.js';
+import { buildAstString } from '../string.js';
 
 let services: ReturnType<typeof createSlartiServices>;
 let parse: ReturnType<typeof parseHelper<Model>>;

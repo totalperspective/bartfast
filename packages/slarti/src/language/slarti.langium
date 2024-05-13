@@ -10,6 +10,7 @@ Element:
 
 type Namespace = Language | Token | Principle | Specification;
 type Named = Namespace | Term | Relation |  Instance
+type NamedOrRefed = Named | Apply | Application | SubRelationSubject | TermRef | RelationTerms | SubRelationObject
 type TermOrToken = Term | Token
 type Meta = Named | AsRelation | Apply
 
