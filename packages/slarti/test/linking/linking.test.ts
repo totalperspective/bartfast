@@ -55,7 +55,7 @@ const tests = [
         expectation: s`
         T
         P1[test[->T, ->T]]
-        P2[T1[->T], T2[->T], [->P1, [->test. [->T], [->T1]]]]
+        P2[T1[->T], [->P1, [->test, [->T], [->T1]]]]
     `
     }
 ]

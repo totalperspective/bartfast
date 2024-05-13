@@ -42,7 +42,7 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
         }
 
         if (isPrinciple(container)) {
-            return [...container.relations]
+            return [...container.relations, ...container.terms]
         }
 
         if (isToken(container)) {
