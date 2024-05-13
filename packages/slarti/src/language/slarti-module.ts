@@ -2,7 +2,7 @@ import { AstNode, AstNodeDescription, DefaultScopeComputation, LangiumDocument, 
 import { createDefaultModule, createDefaultSharedModule, type DefaultSharedModuleContext, type LangiumServices, type LangiumSharedServices, type PartialLangiumServices } from 'langium/lsp';
 import { SlartiGeneratedModule, SlartiGeneratedSharedModule } from './generated/module.js';
 import { SlartiValidator, registerValidationChecks } from './slarti-validator.js';
-import { isLanguage, isNamespace, isPrinciple, isSpecification, isToken, Named, Namespace } from './generated/ast.js';
+import { isLanguage, isModel, isNamespace, isPrinciple, isSpecification, isToken, Named, Namespace } from './generated/ast.js';
 
 // Scope computation for our C++-like language
 export class SlartiScopeComputation extends DefaultScopeComputation {
@@ -47,6 +47,10 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
 
         if (isToken(container)) {
             return [...container.terms]
+        }
+
+        if (isModel(container)) {
+            return [...container.elements.filter(isNamed) as Named[]]
         }
         return []
     }

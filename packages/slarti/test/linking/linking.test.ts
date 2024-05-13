@@ -4,6 +4,7 @@ import { expandToString as s } from "langium/generate";
 import { clearDocuments, parseHelper } from "langium/test";
 import { createSlartiServices } from "../../src/language/slarti-module.js";
 import { Model, Token, isModel, isToken } from "../../src/language/generated/ast.js";
+import { nodeName, nodeNames } from "../parsing/string.js";
 
 let services: ReturnType<typeof createSlartiServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
@@ -38,9 +39,10 @@ describe('Linking tests', () => {
             // and then evaluate the cross references we're interested in by checking
             //  the referenced AST element as well as for a potential error message;
             checkDocumentValid(document)
-                || document.parseResult.value.elements.map(g => isToken(g) ? g.name : '').join('\n')
+                || document.parseResult.value.elements.map(n => nodeNames(n, true)).join('\n')
         ).toBe(s`
-            
+            Test
+            TestTerm[Term[->Test]]
         `);
     });
 });

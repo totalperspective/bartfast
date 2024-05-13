@@ -44,8 +44,9 @@ const tests = [
     {
         name: 'check no errors Relation Name',
         code: `
+        token T
         principle Test {
-            relation test[A,B]
+            relation test[T,T]
         }
         `,
         expected: {
@@ -55,13 +56,14 @@ const tests = [
     {
         name: 'check capital letter validation Relation Name',
         code: `
+        token T
         principle Test {
-            relation Test[A,B]
+            relation Test[T,T]
         }
         `,
         expected: {
             content: s`
-            [2:21..2:25]: Relation name should start with a non-capital.
+            [3:21..3:25]: Relation name should start with a non-capital.
         `
         }
 
@@ -69,7 +71,7 @@ const tests = [
 ]
 describe('Validating', () => {
 
-    test.each(tests)('$description', async ({ code, expected: expected }) => {
+    test.each(tests)('$name', async ({ code, expected: expected }) => {
         document = await parse(code);
 
         const result = checkDocumentValid(document) || document?.diagnostics?.map(diagnosticToString)?.join('\n')
@@ -86,21 +88,6 @@ describe('Validating', () => {
                     break;
             }
         }
-    });
-
-    test('check capital letter validation', async () => {
-        document = await parse(`
-            token testToken
-        `);
-
-        expect(
-            checkDocumentValid(document) || document?.diagnostics?.map(diagnosticToString)?.join('\n')
-        ).toEqual(
-            // 'expect.stringContaining()' makes our test robust against future additions of further validation rules
-            expect.stringContaining(s`
-                [1:18..1:27]: Token name should start with a capital.
-            `)
-        );
     });
 });
 

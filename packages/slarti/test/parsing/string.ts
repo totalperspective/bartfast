@@ -11,8 +11,107 @@ import {
   isApply,
   isBinding,
   isMeta,
+  Named,
+  isTerm,
+  isBasicTerm,
+  isTermDefinition,
 } from '../../src/language/generated/ast.js';
 import { createSlartiServices } from '../../src/language/slarti-module.js';
+
+export function getNamedElements(
+  container: AstNode | Reference<AstNode>
+): (Named | Reference<Named>)[] {
+  if (isReference(container)) {
+    if (!container.ref) {
+      return [];
+    }
+    return getNamedElements(container.ref);
+  }
+  if (isLanguage(container)) {
+    return [...container.tokens, ...container.principles];
+  }
+
+  if (isSpecification(container)) {
+    return [...container.instances];
+  }
+
+  if (isPrinciple(container)) {
+    return [...container.relations];
+  }
+
+  if (isToken(container)) {
+    return [...container.terms];
+  }
+
+  if (isTerm(container)) {
+    if (isTermDefinition(container.definition)) {
+      return getNamedElements(container.definition);
+    }
+    return [];
+  }
+
+  if (isTermDefinition(container)) {
+    return [container.term.term];
+  }
+  return [];
+}
+
+export function nodeName(node: AstNode | Reference<AstNode>, errors = false) {
+  if (isReference(node)) {
+    if (node.error) {
+      if (errors) {
+        return node.error;
+      }
+      return node.$refText;
+    }
+    return nodeName(node.ref!);
+  }
+
+  if (isApply(node)) {
+    return nodeName(node.principle);
+  }
+  if (isUse(node)) {
+    return nodeName(node.language);
+  }
+  if (isBinding(node)) {
+    return nodeName(node.term);
+  }
+
+  if (isNamed(node)) {
+    return node.name;
+  }
+
+  return '';
+}
+
+export function nodeNames(
+  node: AstNode | Reference<AstNode>,
+  errors = false
+): string {
+  if (isReference(node)) {
+    if (node.error) {
+      if (errors) {
+        return node.error.message;
+      }
+      return node.$refText;
+    }
+    return `->${nodeName(node, errors)}`;
+  }
+  let result = '';
+  if (isNamed(node)) {
+    result += nodeName(node, errors);
+  }
+  const children = getNamedElements(node);
+  if (children.length) {
+    let space = '[';
+    for (const child of children) {
+      result += space + nodeNames(child, errors);
+      space = ', ';
+    }
+    result += ']';
+  }
+  return result;
+}
 
 /**
  * Recursively builds a formatted string from the AST nodes.
@@ -28,28 +127,6 @@ export function buildAstString(
 ): string {
   const indent = ' '.repeat(depth * 2); // Adjust indentation level
 
-  function nodeName(node: AstNode | Reference<AstNode>) {
-    if (isReference(node)) {
-      if (node.error) {
-        return node.$refText;
-      }
-      return nodeName(node.ref!);
-    }
-    if (isApply(node)) {
-      return nodeName(node.principle);
-    }
-    if (isUse(node)) {
-      return nodeName(node.language);
-    }
-    if (isBinding(node)) {
-      return nodeName(node.term);
-    }
-
-    if (isNamed(node)) {
-      return node.name;
-    }
-    return '';
-  }
   let result = !isModel(node)
     ? isMetadata(node)
       ? `${indent}:${node.key} "${node.value}"\n`

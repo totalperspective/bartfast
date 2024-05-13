@@ -8,7 +8,7 @@ Element:
     Language | Token | Principle | Specification | Use | Instance
 ;
 
-type Namespace =  Language | Token | Principle | Specification;
+type Namespace = Language | Token | Principle | Specification;
 type Named = Namespace | Term | Relation |  Instance
 type TermOrToken = Term | Token
 type Meta = Named | AsRelation | Apply
@@ -35,11 +35,11 @@ Term:
 ;
 
 TermDefinition:
-    BasicTerm | UnionTerm | ListTerm | TupleTerm
+    BasicTerm ({infer TermDefinition.term=current}) | UnionTerm | ListTerm | TupleTerm
 ;
 
 BasicTerm:
-    type=[Token:QualifiedName]
+    term=[Token:QualifiedName]
 ;
 
 UnionTerm:
