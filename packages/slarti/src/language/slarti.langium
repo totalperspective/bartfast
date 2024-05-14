@@ -1,5 +1,7 @@
 grammar Slarti
 
+type Container = Model | Language | Specification | Token | Principle | Relation | Apply | Instance
+
 entry Model:
     elements+=Element*
 ;

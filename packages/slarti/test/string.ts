@@ -87,11 +87,14 @@ export function getNamedElements(
   return [];
 }
 
-export function nodeName(node: AstNode | Reference<AstNode>, errors = false) {
+export function nodeName(
+  node: AstNode | Reference<AstNode>,
+  errors = false
+): string {
   if (isReference(node)) {
     if (node.error) {
       if (errors) {
-        return node.error;
+        return `"${node.error.message}"`;
       }
       return node.$refText;
     }
@@ -122,11 +125,11 @@ export function nodeNames(
   if (isReference(node)) {
     if (node.error) {
       if (errors) {
-        return node.error.message;
+        return `"${node.error.message}"`;
       }
       return node.$refText;
     }
-    return `->${nodeName(node, errors)}`;
+    return `${node.$refText}->${nodeName(node, errors)}`;
   }
   let result = '';
   if (isNamed(node)) {

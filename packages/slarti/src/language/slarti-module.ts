@@ -4,8 +4,12 @@ import type { DefaultSharedModuleContext, LangiumServices, LangiumSharedServices
 import { createDefaultModule, createDefaultSharedModule} from 'langium/lsp';
 import { SlartiGeneratedModule, SlartiGeneratedSharedModule } from './generated/module.js';
 import { SlartiValidator, registerValidationChecks } from './slarti-validator.js';
-import { isApply, isLanguage, isModel, isNamespace, isPrinciple, isSpecification, isToken, Named, Namespace, Principle } from './generated/ast.js';
+import { Container, isApply, isContainer, isLanguage, isModel, isNamespace, isPrinciple, isSpecification, isToken, Model, Named, Namespace } from './generated/ast.js';
 
+function logFrame(frame: AstNodeDescription[]) {
+    const f = frame.reduce((f, d) => ({...f, [d.name]: d.type}), {})
+    console.log(f);
+}
 // Scope computation for our C++-like language
 export class SlartiScopeComputation extends DefaultScopeComputation {
 
@@ -27,7 +31,7 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
     }
 
     override async computeLocalScopes(document: LangiumDocument): Promise<PrecomputedScopes> {
-        const model = document.parseResult.value as Namespace;
+        const model = document.parseResult.value as Model;
         // This map stores a list of descriptions for each node in our document
         const scopes = new MultiMap<AstNode, AstNodeDescription>();
         this.processContainer(model, scopes, document);
@@ -45,15 +49,9 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
         }
 
         if (isPrinciple(container)) {
-            return [
-                ...container.relations, 
-                ...container.terms
-            ]
+            return [...container.relations, ...container.terms]
         }
 
-        if (isApply(container) && container.principle.ref) {
-            return container.principle.ref.relations
-        }
         if (isToken(container)) {
             return [...container.terms]
         }
@@ -65,42 +63,68 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
         return []
     }
 
+    private getContainerElements(container: AstNode): Container[] {
+        if (isPrinciple(container)) {
+            return [...container.relations, ...container.applies]
+        }
+        if (isLanguage(container)) {
+            return [...container.tokens, ...container.principles]
+        }
+
+        if (isSpecification(container)) {
+            return [...container.instances]
+        }
+        if (isModel(container)) {
+            return [...container.elements.filter(isContainer) as Container[]]
+        }
+
+        return []
+    }
+
     private processContainer(
-        container: Namespace,
+        container: Container,
         scopes: PrecomputedScopes,
-        document: LangiumDocument
+        document: LangiumDocument,
+        frame: AstNodeDescription[] = []
     ): AstNodeDescription[] {
         const localDescriptions: AstNodeDescription[] = [];
-        for (const element of this.getNamedElements(container)) {
-            if (isNamed(element)) {
-                // console.log({[element.$type]: element.name});
-                // Create a simple local name for the element
-                const description = this.descriptions.createDescription(element, element.name, document);
-                localDescriptions.push(description);
-            }
-            if (isNamespace(element) || isModel(element)) {
-                
-                const nestedDescriptions = this.processContainer(element, scopes, document);
-                for (const description of nestedDescriptions) {
-                    // Add qualified names to the container
-                    // This could also be a partial qualified name
-                    const {node} = description
-                    if (isPrinciple(node)) {
-                        
-                        const root = description.name;
-                        node.requires.forEach(r => {
-                            const name = `${r.principle.$refText}`
-                            const path = `${root}.${name}`;
-                            const principle = this.lookupNode(localDescriptions, name)
-                            if (principle) {
-                                const description = this.descriptions.createDescription(principle, path, document);
-                                localDescriptions.push(description);
-                            }
-                        })
-                    }
-                    const qualified = this.createQualifiedDescription(element, description, document);
-                    localDescriptions.push(qualified);
+        if (isApply(container)) {
+            const name = container.principle.$refText
+            console.log({[container.$type]: name});
+            
+            const principle = this.lookupNode(frame, name)
+            if (isContainer(principle)) {
+                const relationDescriptions = this.processContainer(principle, scopes, document).filter(r => r.type === 'Relation');
+                for (const description of relationDescriptions) {
+                    localDescriptions.push(description)
+                    console.log({[name]: [description.type, description.name]});
+                    
                 }
+            }
+        }
+        for (const element of this.getNamedElements(container)) {
+            // console.log({[element.$type]: element.name});
+            // Create a simple local name for the element
+            const description = this.descriptions.createDescription(element, element.name, document);
+            localDescriptions.push(description);
+        }
+        for (const element of this.getContainerElements(container)) {
+            const nestedDescriptions = this.processContainer(element, scopes, document, [...frame, ...localDescriptions]);
+            for (const description of nestedDescriptions) {
+                const qualified = this.createQualifiedDescription(element, description, document);
+                localDescriptions.push(qualified);
+            }
+            if (isPrinciple(element)) {
+                const root = element.name;
+                element.requires.forEach(r => {
+                    const name = `${r.principle.$refText}`
+                    const path = `${root}.${name}`;
+                    const principle = this.lookupNode([...frame, ...localDescriptions], name)
+                    if (principle) {
+                        const description = this.descriptions.createDescription(principle, path, document);
+                        localDescriptions.push(description);
+                    }
+                })
             }
         }
         scopes.addAll(container, localDescriptions);
@@ -117,7 +141,7 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
     }
 
     private createQualifiedDescription(
-        container: Namespace,
+        container: Container,
         description: AstNodeDescription,
         document: LangiumDocument
     ): AstNodeDescription {
@@ -128,7 +152,7 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
 
     private getPath(node: AstNode, name: string) {
         const path = [name]
-        let parent: AstNode | undefined = node.$container;
+        let parent: AstNode | undefined = node;
         while (isAstNode(parent)) {
             // Iteratively prepend the name of the parent namespace
             // This allows us to work with nested namespaces

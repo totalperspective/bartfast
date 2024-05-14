@@ -34,7 +34,7 @@ const tests = [
         `,
         expectation: s`
         Test
-        TestTerm[Term[->Test]]
+        TestTerm[Term[Test->Test]]
     `
     },
     {
@@ -42,20 +42,20 @@ const tests = [
         code: `
         token T
         principle P1 {
-            relation test[T,T]
+            relation testRel[T,T]
         }
 
         principle P2 {
             term T1[T]
             apply P1 {
-                test -> T, T1
+                testRel -> T, T1
             }
         }
         `,
         expectation: s`
         T
-        P1[test[->T, ->T]]
-        P2[T1[->T], [->P1, [->test, [->T], [->T1]]]]
+        P1[testRel[T->T, T->T]]
+        P2[T1[T->T], [P1->P1, [testRel->testRel, [T->T], [T1->T1]]]]
     `
     },
     {
@@ -72,8 +72,8 @@ const tests = [
         `,
         expectation: s`
         T
-        P1[test[->T, ->T]]
-        P2[P1[test[->T, ->T]]]
+        P1[test[T->T, T->T]]
+        P2[P1[test[T->T, T->T]]]
     `
     },
     {
@@ -94,7 +94,31 @@ const tests = [
             }
         }`,
         expectation: s`
-        L[T, P1[test[->T, ->T]], P2[P1[test[->T, ->T]]], P3[[->P1]]]
+        L[T, P1[test[T->T, T->T]], P2[P1[test[T->T, T->T]]], P3[[P2.P1->P1]]]
+    `
+    },
+    {
+        name: 'applying a required a principle in a language',
+        code: `
+        language L {
+            token T
+            principle P1 {
+                relation test[T,T]
+            }
+
+            principle P2 {
+                require P1
+            }
+
+            principle P3 {
+                term A[T]
+                apply P2.P1 {
+                    test -> A, A
+                }
+            }
+        }`,
+        expectation: s`
+        L[T, P1[test[T->T, T->T]], P2[P1[test[T->T, T->T]]], P3[A[T->T], [P2.P1->P1, [test->test, [A->A], [A->A]]]]]
     `
     }
 ]
