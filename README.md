@@ -24,7 +24,7 @@ While libraries offer quick solutions, embracing a separate Domain-Specific Lang
 By using Bartfast, you're not just implementing a design library; you're sculpting a language that speaks to your project's unique needs. This approach fosters innovation and creativity, allowing you to break free from conventional design constraints and unleash your team's full potential.
 
 ### Bridging Creativity and Technicality
-A separate DSL bridges the gap between creativity and technicality, enabling designers and developers to collaborate seamlessly. With Bartfast, you can define design principles and tokens in a language that's both expressive and practical, fostering a harmonious workflow and driving towards design excellence.
+A separate DSL bridges the gap between creativity and technicality, enabling designers and developers to collaborate seamlessly. With Bartfast, you can define design principles and tokens in a language that's both expressive and practical, fostering a harmonious workflow and driving toward design excellence.
 
 Choosing a separate DSL over a library isn't just about functionality—it's about embracing a mindset that prioritizes creativity, collaboration, and the pursuit of design perfection.
 
@@ -74,7 +74,7 @@ The `:intro` tag provides a brief introduction to the purpose or functionality o
 The `:detail` tag offers a more detailed explanation of the DSL construct, providing additional context or information.
 
 #### Summary Tag
-The `:summary` tag summarizes the essential characteristics or features of a DSL construct concisely.
+The `:summary` tag succinctly summarizes the essential characteristics or features of a DSL construct.
 
 ### Languages
 #### Starting a Language
