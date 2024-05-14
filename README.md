@@ -10,7 +10,7 @@
 
 ## Introduction
 
-Bartfast is a design language builder inspired by Douglas Adams’ character Slartibartfast, a planet designer from the novel The Hitchhiker's Guide to the Galaxy. Much like Slartibartfast, who took immense pride in crafting detailed, award-winning coastlines, Bartfast aims to aid developers and designers in meticulously designing and refining their digital environments.
+Bartfast is a design language builder inspired by Douglas Adams’ character Slartibartfast, a planet designer from the novel *The Hitchhiker's Guide to the Galaxy*. Much like Slartibartfast, who took immense pride in crafting detailed, award-winning coastlines, Bartfast aims to aid developers and designers in meticulously designing and refining their digital environments.
 
 In the words of Slartibartfast himself, "I'd far rather be happy than right any day." This sentiment encapsulates Bartfast's philosophy of prioritizing user experience and design satisfaction over rigid adherence to technical correctness.
 
@@ -20,45 +20,45 @@ Bartfast emphasizes clarity, modularity, and reusability, allowing design langua
 
 While libraries offer quick solutions, embracing a separate Domain-Specific Language (DSL) like Bartfast adds a touch of creativity and flexibility to your design process. Instead of relying on off-the-shelf solutions, a DSL empowers you to craft bespoke design languages that resonate with your project's vision.
 
-### Tailoring to Your Vision:
+### Tailoring to Your Vision
 By using Bartfast, you're not just implementing a design library; you're sculpting a language that speaks to your project's unique needs. This approach fosters innovation and creativity, allowing you to break free from conventional design constraints and unleash your team's full potential.
 
-### Bridging Creativity and Technicality:
+### Bridging Creativity and Technicality
 A separate DSL bridges the gap between creativity and technicality, enabling designers and developers to collaborate seamlessly. With Bartfast, you can define design principles and tokens in a language that's both expressive and practical, fostering a harmonious workflow and driving towards design excellence.
 
-Choosing a separate DSL over a library isn't just about functionality—it's about embracing a mindset prioritising creativity, collaboration, and the pursuit of design perfection.
+Choosing a separate DSL over a library isn't just about functionality—it's about embracing a mindset that prioritizes creativity, collaboration, and the pursuit of design perfection.
 
 ## Key Approaches in Bartfast
 
 Bartfast is designed with several high-level approaches to ensure flexibility, modularity, and ease of use. These approaches shape the core principles of the design language system and guide its implementation:
 
-### Declarative and Incremental Definition:
+### Declarative and Incremental Definition
 Bartfast adopts a declarative and incremental approach to design language definition, allowing designers to express their intentions clearly and build languages incrementally, token by token. By declaratively defining design elements and principles, users can focus on the "what" rather than the "how," promoting readability, maintainability, and iterative development.
 
-### Composable, Extensible, and Serializable:
-Bartfast promotes composability, extensibility, and serializability at various levels, enabling designers to compose, extend, and serialize individual tokens, principles, and entire design languages. This flexibility empowers teams to tailor Bartfast to their needs, seamlessly integrating prebuilt libraries and serializing design languages as values. Bartfast fosters a modular and adaptable ecosystem by allowing customisation at granular levels.
+### Composable, Extensible, and Serializable
+Bartfast promotes composability, extensibility, and serializability at various levels, enabling designers to compose, extend, and serialize individual tokens, principles, and entire design languages. This flexibility empowers teams to tailor Bartfast to their needs, seamlessly integrating prebuilt libraries and serializing design languages as values. Bartfast fosters a modular and adaptable ecosystem by allowing customization at granular levels.
 
-### Graph-Based Representation:
+### Graph-Based Representation
 Bartfast employs a graph-based internal representation, facilitating pattern matching and graph traversal for defining higher-level design concepts. This approach enables sophisticated querying and manipulation of design elements, empowering users to create complex design systems with ease and efficiency.
 
-### Framework Agnosticism:
+### Framework Agnosticism
 Bartfast is completely agnostic to target frameworks, dialects, UI libraries, and CSS frameworks, seamlessly integrating into various tech stacks. This framework-agnostic approach provides a universal solution for design language management, ensuring compatibility and interoperability across different development environments.
 
-### Pluggable Architecture:
+### Pluggable Architecture
 Bartfast features a pluggable architecture, with generators as the primary plugin used. These generators enable the seamless integration of various outputs, from TypeScript types and JSON schema to class lists for a component and Figma files. This extensibility allows users to customize Bartfast to their specific requirements, effortlessly integrate with external tools and systems, and tailor the workflow to suit their preferences.
 
-### Documentation-First Approach:
+### Documentation-First Approach
 Documentation is prioritized in Bartfast, supporting annotations that describe various aspects of the design language, including documentation, types, and other relevant information. These annotations ensure that design elements are well-documented and easily understandable by all stakeholders, promoting clarity and transparency throughout the design process. By integrating annotations directly into the definition, Bartfast streamlines the documentation workflow, making it an integral part of the design language development process.
 
 ## Introducing Bartfast's DSL: Simplicity and Expressiveness
 
 Bartfast's Domain-Specific Language (DSL) embodies simplicity and expressiveness. It is distilled into two foundational concepts: Design Tokens and Design Principles. Despite its minimalist approach, this DSL empowers designers and developers to create robust design systems easily.
 
-### Design Tokens:
-At the core of Bartfast's DSL are Design Tokens, representing fundamental design values such as colours, typography, spacing, and more. These tokens serve as the elemental building blocks of the design language, providing a concise and versatile vocabulary for expressing design elements. Design Tokens can also be aggregated to form more complex concepts, enabling designers to encapsulate intricate design details within a single token.
+### Design Tokens
+At the core of Bartfast's DSL are Design Tokens, representing fundamental design values such as colors, typography, spacing, and more. These tokens serve as the elemental building blocks of the design language, providing a concise and versatile vocabulary for expressing design elements. Design Tokens can also be aggregated to form more complex concepts, enabling designers to encapsulate intricate design details within a single token.
 
-### Design Principles:
-Complementing Design Tokens are Design Principles encapsulating the system's design application rules and guidelines. These principles articulate fundamental design philosophies, ensuring consistency, accessibility, and aesthetic coherence across all components. By adhering to Design Principles, designers maintain clarity and purpose in their design decisions, fostering a cohesive and intuitive user experience.
+### Design Principles
+Complementing Design Tokens are Design Principles that encapsulate the system's design application rules and guidelines. These principles articulate fundamental design philosophies, ensuring consistency, accessibility, and aesthetic coherence across all components. By adhering to Design Principles, designers maintain clarity and purpose in their design decisions, fostering a cohesive and intuitive user experience.
 
 Design Tokens and Design Principles are the cornerstone of Bartfast's DSL, offering a streamlined yet powerful framework for designing and refining digital environments. With its emphasis on simplicity and expressiveness, Bartfast empowers teams to create design systems that are elegant in conception and impactful in execution.
 
@@ -77,12 +77,13 @@ The `:detail` tag offers a more detailed explanation of the DSL construct, provi
 The `:summary` tag summarizes the essential characteristics or features of a DSL construct concisely.
 
 ### Languages
-#### Starting a language
+#### Starting a Language
 To begin defining a new language in Bartfast's DSL, use the following syntax:
 ```clj
-language {LanguageName}
+language <LanguageName> {
   :intro "Brief introduction to the language."
   :detail "Detailed description of the language."
+}
 ```
 
 ### Tokens
@@ -91,24 +92,27 @@ Tokens are fundamental components within your language, serving as building bloc
 #### Defining Tokens
 To define a standalone token:
 ```clj
-token {TokenName}
+token <TokenName> {
   :summary "Summary of the token's purpose."
   :detail "Detailed description of the token's functionality."
+}
 ```
 
 #### Defining Aggregates with Terms
 Aggregates tokens collect related data or concepts using individual terms:
-
 ```clj
-token {AggregateName}
+token <AggregateName> {
   :summary "Summary of the aggregate's purpose."
   :detail "Detailed description of the aggregate's functionality."
 
-term {TermName1}{AggregateName}
-  :summary "Summary of the term's purpose within the aggregate."
+  term <TermName1>[<AggregateName>] {
+    :summary "Summary of the term's purpose within the aggregate."
+  }
 
-term {TermName2}{AggregateName}
-  :summary "Summary of another term's purpose within the aggregate."
+  term <TermName2>[<AggregateName>] {
+    :summary "Summary of another term's purpose within the aggregate."
+  }
+}
 ```
 
 Defining aggregates with terms allows for structured organization and representation of complex data structures within your language.
@@ -116,34 +120,36 @@ Defining aggregates with terms allows for structured organization and representa
 ### Principle Satisfaction Syntax
 
 To indicate that a token satisfies a particular principle, the following syntax is used:
-
 ```clj
-token {TokenName}
-  satisfies {PrincipleName}
+token <TokenName> {
+  satisfies <PrincipleName>
+}
 ```
-
-This statement signifies that the token `{TokenName}` aligns with the guidelines or rules specified by the principle `{PrincipleName}`. It establishes a clear link between the token's definition and the overarching design principles within the DSL.
+This statement signifies that the token `<TokenName>` aligns with the guidelines or rules specified by the principle `<PrincipleName>`. It establishes a clear link between the token's definition and the overarching design principles within the DSL.
 
 #### Principles
 Principles encapsulate design guidelines or rules within a DSL.
 ```clj
-principle {PrincipleName}
+principle <PrincipleName> {
   :intro "Brief introduction to the principle."
   :summary "Summary of the principle's purpose."
+}
 ```
 
 ##### Terms
 Terms define individual components or attributes within a principle.
 ```clj
-term {TermName}[{TokenName}]
+term <TermName>[<TokenName>] {
   :summary "Summary of the term's purpose."
+}
 ```
 
 ##### Relations
 Relations establish connections or dependencies between terms within a principle.
 ```clj
-relation {RelationName}[{Term | TokenName}, {Term | TokenName}]
+relation <RelationName>[<Term | TokenName>, <Term | TokenName>] {
   :summary "Summary of the relation's purpose."
+}
 ```
 
 ##### As Relation
@@ -155,53 +161,58 @@ as [{Term | TokenName}, {Term | TokenName}]
 #### Applying Principles
 To apply principles within a specification, utilize the following syntax:
 ```clj
-apply {PrincipleName}
-  {RelationName} -> {Term}, {Term}
-  {AnotherRelationName} -> {Term}, {Term}
-  {AdditionalRelationName} -> {Term}, {Term}
+apply <PrincipleName> {
+  <RelationName> -> <Term>, <Term>
+  <AnotherRelationName> -> <Term>, <Term>
+}
 ```
 
 #### Principle Satisfaction
 Principles can require other principles, indicating dependencies or the aggregation of design guidelines.
 ```clj
-principle {PrincipleName}
-  require {OtherPrincipleName}
+principle <PrincipleName> {
+  require <OtherPrincipleName>
+}
 ```
 
 ### Specification
 #### Starting a Specification
 Initiate a specification by referencing the desired language:
 ```clj
-specify {SpecificationName}
+specify <SpecificationName> {
   :intro "Brief introduction to the specification."
+}
 ```
 
 #### Using Languages
 Incorporate previously defined languages into the specification:
+
 ```clj
-use {LanguageName}
+use <LanguageName>
 ```
 
 #### Token Instances
 Define instances of tokens within the specification, specifying their values:
 ```clj
-{tokenInstanceName} <- {TokenName}
-  ; Definiton
+<tokenInstanceName> <- <TokenName> {
+  :intro "Brief introduction to the token instance."
+}
 ```
 
 ##### Bindings
 Assign values to individual terms within token instances:
 ```clj
-{Term} -> {Value}
-{AnotherTerm} -> {AnotherValue}
+<Term> -> <Value>
+<AnotherTerm> -> <AnotherValue>
 ```
 
 ##### Applying Principles
 Apply principles within the specification, binding specific terms to relations:
 ```clj
-apply {PrincipleName}
-  {RelationName} -> {Term}, {Term}
-  {AnotherRelationName} -> {Term}, {Term}
+apply <PrincipleName> {
+  <RelationName> -> <Term>, <Term>
+  <AnotherRelationName> -> <Term>, <Term>
+}
 ```
 
 ### Using Dotted Notation
@@ -215,45 +226,39 @@ LanguageName.TokenName
 This notation allows for clear and concise referencing of elements within complex DSL structures, enhancing readability and maintainability of specifications.
 
 ### Term Definitions
-
 Terms within a DSL provide granularity and specificity, defining individual components or attributes within principles, tokens, or relations. They play a crucial role in structuring and organizing the DSL's concepts. Here, we discuss various types of term definitions commonly used in DSLs.
 
 #### Basic Terms
 Basic terms define single components or attributes within a DSL construct. They are straightforward and represent atomic units of data or concepts.
-
 ```clj
-term {TermName}[{TokenName}]
+term <TermName>[<TokenName>]
 ```
-This syntax defines a basic term named `{TermName}` within the context of the token `{TokenName}`. It represents a single component or attribute associated with the specified token.
+This syntax defines a basic term named `<TermName>` within the context of the token `<TokenName>`. It represents a single component or attribute associated with the specified token.
 
 #### Using Tokens as Term Names
 In some cases, it's beneficial to use tokens as term names, especially when the term represents a specific instance or property defined by the token.
-
 ```clj
-term [{TermTokenName}][{ValueTokenName}]
+term [<TermTokenName>][<ValueTokenName>]
 ```
-Here, the term `{TermTokenName}` is defined using the token `{ValueTokenName}` as its name. This usage is particularly useful when the term encapsulates a value defined by another token.
+Here, the term `<TermTokenName>` is defined using the token `<ValueTokenName>` as its name. This usage is particularly useful when the term encapsulates a value defined by another token.
 
 #### Union Terms
 Union terms allow for flexibility by encompassing multiple token options within a single term. This enables the term to represent a variety of concepts or attributes.
-
 ```clj
-term {UnionTermName}[{TokenNameA} | {TokenNameB}]
+term <UnionTermName>[<TokenNameA> | <TokenNameB>]
 ```
-In this example, the term `{UnionTermName}` is defined as a union of `{TokenNameA}` and `{TokenNameB}`. It can represent attributes that align with either of the specified tokens.
+In this example, the term `<UnionTermName>` is defined as a union of `<TokenNameA>` and `<TokenNameB>`. It can represent attributes that align with either of the specified tokens.
 
 #### List Terms
 List terms facilitate the representation of collections or sequences of data within a DSL. They allow for the aggregation of multiple instances or values.
-
 ```clj
-term {ListTermName}[{TokenName}...]
+term <ListTermName>[<TokenName>...]
 ```
-Here, `{ListTermName}` represents a list of instances or values associated with the token `{TokenName}`. The ellipsis (...) indicates that multiple occurrences of the specified token can be included within the list.
+Here, `<ListTermName>` represents a list of instances or values associated with the token `<TokenName>`. The ellipsis (...) indicates that multiple occurrences of the specified token can be included within the list.
 
 ## Sample Language Definition
 
 Bartfast uses a structured language to define tokens and principles that guide the design process. Here is an example of how color principles are integrated:
-
 ```clj
 language Colour {
   :intro "Defines color design principles and tokens for creating cohesive and accessible digital environments."
@@ -273,9 +278,9 @@ language Colour {
     }
     relation analogous[Value, Value] {
       :intro "Defines analogous color pairs."
-      :detail "Analogous colors are colors that are adjacent to each other on the color wheel"
+      :detail "Analogous colors are colors that are adjacent to each other on the color wheel."
     }
-    relation triadic[Value, Value, Value] {
+    relation triadic[Value, [Value, Value]] {
       :intro "Defines combinations of triadic colors."
       :detail "Triadic colors are sets of three colors that are evenly spaced around the color wheel, creating balanced and vibrant color schemes."
     }
@@ -343,17 +348,17 @@ language Colour {
     }
     term Text[Value] {
       :summary "Color for all text elements to ensure readability."
-      }
+    }
     term Primary[Value] {
       :summary "Dominant color used for primary actions and highlights."
     }
     term Secondary[Value] {
       :summary "Supplementary color that supports the primary palette."
     }
-    apply Accessibility.Theory {
+    apply Harmony {
       complements -> Primary, Secondary
       analogous -> Primary, Background
-      triadic -> Primary, Secondary, Text
+      triadic -> Primary, [Secondary, Text]
       splitComplementary -> Background, [Secondary, Primary]
     }
     apply Accessibility {
@@ -366,24 +371,22 @@ language Colour {
       }
     }
   }
-  token Name
+  token Name {
     :summary "Identifies specific colors within the design system for consistent application."
     :detail "Name serves as a naming convention for systematic use within the design system. Each Name is associated with a specific color defined under the Value token, promoting consistency throughout the design elements."
+  }
 
-  token Palette
+  token Palette {
     :summary "Organizes a set of named colors to ensure consistency across UI components."
     :detail "Palette serves as a structured repository within the Colour framework, systematically organizing a collection of named colors. This token facilitates the consistent application of color across various design elements, maintaining coherence and supporting thematic consistency."
-    term [Name][Value] {
-      :summary "This mapping defines specific visual colors associated with named color identifiers within the design system. Each entry in the Palette represents a named color that is directly linked to a defined visual color in the Value token, ensuring consistency across the design system."
-    }
     satisfies Theory
+  }
 }
 ```
 
 ## Example Theme Instances
 
 To demonstrate how Bartfast can be applied to define specific themes within a design system, consider the following examples:
-
 ```clj
 specify MyBrand {
   :intro "This file defines a color palette and themes using the Colour DSL."
@@ -402,7 +405,9 @@ specify MyBrand {
     Green -> #00FF00
     Yellow -> #FFFF00
     Orange -> #FFA500
-    Purple -> #800080
+    Purple
+
+ -> #800080
     Pink -> #FFC0CB
     apply Colour.Theory.Harmony {
       :intro "Complementary colours"
@@ -417,19 +422,19 @@ specify MyBrand {
       analogous -> Orange, Yellow
       analogous -> Purple, Pink
     }
-    apply ColorTheory.Harmony {
+    apply Colour.Theory.Harmony {
       :intro "Triadic colours"
       triadic -> Red, Green, Blue
       triadic -> Green, Blue, Yellow
       triadic -> Purple, Pink, Orange
     }
-    apply ColorTheory.Harmony {
+    apply Colour.Theory.Harmony {
       :intro "Split complementary colours"
       splitComplementary -> Green, LightBlue, Red
       splitComplementary -> Yellow, Blue, Red
       splitComplementary -> Pink, Yellow, Red
     }
-    apply ColorTheory.Context {
+    apply Colour.Context {
       :intro "Contextual colours"
       contrastEnhancement -> White, Black
       environmentImpact -> Grey, DarkGrey
@@ -465,4 +470,4 @@ specify MyBrand {
 
 Bartfast is designed to be a foundational tool for creating, managing, and evolving your design system. With its emphasis on detailed design principles and modular structure, it allows design teams to craft environments that are not only visually appealing but also functionally tailored to meet diverse user needs.
 
-Implemented using https://langium.org/
+Implemented using [Langium](https://langium.org/).

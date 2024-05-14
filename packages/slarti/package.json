@@ -36,8 +36,7 @@
         "monaco-editor": "npm:@codingame/monaco-editor-treemended@1.83.16",
         "monaco-editor-workers": "~0.44.0",
         "monaco-editor-wrapper": "~3.5.0",
-        "monaco-languageclient": "~7.2.0",
-        "vscode": "npm:@codingame/monaco-vscode-api@1.83.16"
+        "monaco-languageclient": "~7.2.0"
     },
     "devDependencies": {
         "@types/node": "^18.0.0",
@@ -50,7 +49,8 @@
         "concurrently": "~8.2.1",
         "esbuild": "~0.19.2",
         "vite": "~4.4.11",
-        "vitest": "~1.0.0"
+        "vitest": "~1.0.0",
+        "vscode": "npm:@codingame/monaco-vscode-api@1.83.16"
     },
     "displayName": "slarti",
     "engines": {
@@ -68,7 +68,9 @@
                     "Slarti",
                     "slarti"
                 ],
-                "extensions": [".slarti"],
+                "extensions": [
+                    ".slarti"
+                ],
                 "configuration": "./language-configuration.json"
             }
         ],

@@ -26,17 +26,17 @@ Token:
 
 Principle:
     'principle' name=ID
-    ( '{' (metadata+=Metadata | terms+=Term | relations+=Relation | as=AsRelation | applies+=Apply)* '}' )?
+    ( '{' (metadata+=Metadata | terms+=Term | relations+=Relation | as=AsRelation | applies+=Apply | requires+=Require)* '}' )?
 ;
 
 Term:
     'term' name=ID
-    definition=TermDefinition
+    '[' TermDefinition ']'
     ( '{' (metadata+=Metadata)* '}' )?
 ;
 
-TermDefinition:
-    BasicTerm ({infer TermDefinition.term=current}) | UnionTerm | ListTerm | TupleTerm
+fragment TermDefinition:
+    definition=(BasicTerm | UnionTerm | ListTerm | TupleTerm)
 ;
 
 BasicTerm:
@@ -81,7 +81,7 @@ TermRef:
 ;
 
 ShadowTerm:
-    term=[Term:ShadowName]
+    term=ShadowName
 ;
 
 TermTuple:
@@ -121,6 +121,10 @@ Specification:
 
 Use:
     'use' language=[Language:QualifiedName]
+;
+
+Require:
+    'require' principle=[Principle:QualifiedName]
 ;
 
 Instance:

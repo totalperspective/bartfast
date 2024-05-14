@@ -1,10 +1,10 @@
 import { afterEach, beforeAll, describe, expect, test } from "vitest";
-import { EmptyFileSystem, type LangiumDocument, AstNode } from "langium";
+import { EmptyFileSystem, type LangiumDocument } from "langium";
 import { expandToString as s } from "langium/generate";
 import { clearDocuments, parseHelper } from "langium/test";
 import { createSlartiServices } from "../../src/language/slarti-module.js";
-import { Model, Token, isModel, isToken } from "../../src/language/generated/ast.js";
-import { nodeName, nodeNames } from "../string.js";
+import { Model, isModel } from "../../src/language/generated/ast.js";
+import { nodeNames } from "../string.js";
 
 let services: ReturnType<typeof createSlartiServices>;
 let parse:    ReturnType<typeof parseHelper<Model>>;
@@ -29,7 +29,7 @@ const tests = [
         token Test
 
         token TestTerm {
-            term Term Test
+            term Term[Test]
         }
         `,
         expectation: s`
@@ -46,7 +46,7 @@ const tests = [
         }
 
         principle P2 {
-            term T1 T
+            term T1[T]
             apply P1 {
                 test -> T, T1
             }
@@ -56,6 +56,24 @@ const tests = [
         T
         P1[test[->T, ->T]]
         P2[T1[->T], [->P1, [->test, [->T], [->T1]]]]
+    `
+    },
+    {
+        name: 'requiring a principle',
+        code: `
+        token T
+        principle P1 {
+            relation test[T,T]
+        }
+
+        principle P2 {
+            require P1
+        }
+        `,
+        expectation: s`
+        T
+        P1[test[->T, ->T]]
+        P2[P1[test[->T, ->T]]]
     `
     }
 ]

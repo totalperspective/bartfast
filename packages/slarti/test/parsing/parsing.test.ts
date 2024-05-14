@@ -1,6 +1,5 @@
 import { beforeAll, describe, expect, test } from 'vitest';
-import type { LangiumDocument } from 'langium'
-import { AstNode, EmptyFileSystem } from 'langium';
+import { AstNode, EmptyFileSystem, LangiumDocument } from 'langium';
 import { expandToString as s } from 'langium/generate';
 import { parseHelper } from 'langium/test';
 import { createSlartiServices } from '../../src/language/slarti-module.js';
@@ -152,7 +151,7 @@ const tests = [
         language NestedExample {
           token TokenName
           token OuterToken {
-              term InnerTerm TokenName
+              term InnerTerm[TokenName]
           }
         }
       `,

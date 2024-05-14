@@ -1,8 +1,10 @@
-import { AstNode, AstNodeDescription, DefaultScopeComputation, LangiumDocument, type Module, MultiMap, PrecomputedScopes, inject, isNamed } from 'langium';
-import { createDefaultModule, createDefaultSharedModule, type DefaultSharedModuleContext, type LangiumServices, type LangiumSharedServices, type PartialLangiumServices } from 'langium/lsp';
+import type { Module } from 'langium';
+import { AstNode, AstNodeDescription, DefaultScopeComputation, LangiumDocument, MultiMap, PrecomputedScopes, inject, isAstNode, isNamed } from 'langium';
+import type { DefaultSharedModuleContext, LangiumServices, LangiumSharedServices, PartialLangiumServices } from 'langium/lsp';
+import { createDefaultModule, createDefaultSharedModule} from 'langium/lsp';
 import { SlartiGeneratedModule, SlartiGeneratedSharedModule } from './generated/module.js';
 import { SlartiValidator, registerValidationChecks } from './slarti-validator.js';
-import { isLanguage, isModel, isNamespace, isPrinciple, isSpecification, isToken, Named, Namespace } from './generated/ast.js';
+import { isApply, isLanguage, isModel, isNamespace, isPrinciple, isSpecification, isToken, Named, Namespace } from './generated/ast.js';
 
 // Scope computation for our C++-like language
 export class SlartiScopeComputation extends DefaultScopeComputation {
@@ -23,12 +25,13 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
         }
         return exportedDescriptions;
     }
-    
+
     override async computeLocalScopes(document: LangiumDocument): Promise<PrecomputedScopes> {
         const model = document.parseResult.value as Namespace;
         // This map stores a list of descriptions for each node in our document
         const scopes = new MultiMap<AstNode, AstNodeDescription>();
         this.processContainer(model, scopes, document);
+        
         return scopes;
     }
 
@@ -42,9 +45,16 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
         }
 
         if (isPrinciple(container)) {
-            return [...container.relations, ...container.terms]
+            return [
+                ...container.relations, 
+                ...container.terms,
+                ...container.requires.map(r => r.principle).filter(r => r.ref).map(r => r.ref).filter(isPrinciple)
+            ]
         }
 
+        if (isApply(container) && container.principle.ref) {
+            return container.principle.ref.relations
+        }
         if (isToken(container)) {
             return [...container.terms]
         }
@@ -52,12 +62,13 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
         if (isModel(container)) {
             return [...container.elements.filter(isNamed) as Named[]]
         }
+
         return []
     }
 
     private processContainer(
-        container: Namespace, 
-        scopes: PrecomputedScopes, 
+        container: Namespace,
+        scopes: PrecomputedScopes,
         document: LangiumDocument
     ): AstNodeDescription[] {
         const localDescriptions: AstNodeDescription[] = [];
@@ -76,14 +87,27 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
                     localDescriptions.push(qualified);
                 }
             }
+            if (isPrinciple(element)) {
+                const rootDesc = this.descriptions.createDescription(element, element.name, document);
+                const root = this.getQualifiedName(element, rootDesc.name);
+                element.requires.forEach(r => {
+                    const {ref} = r.principle
+                    if (!ref) {
+                        return
+                    }
+                    const name = `${root}.${ref.name}`;
+                    const description = this.descriptions.createDescription(ref, name, document);
+                    localDescriptions.push(description);
+                })
+            }
         }
         scopes.addAll(container, localDescriptions);
         return localDescriptions;
     }
 
     private createQualifiedDescription(
-        container: Namespace, 
-        description: AstNodeDescription, 
+        container: Namespace,
+        description: AstNodeDescription,
         document: LangiumDocument
     ): AstNodeDescription {
         // `getQualifiedName` has been implemented in the previous section
@@ -93,12 +117,14 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
 
     private getQualifiedName(node: AstNode, name: string): string {
         let parent: AstNode | undefined = node.$container;
-        while (isNamespace(parent)) {
+        while (isAstNode(parent)) {
             // Iteratively prepend the name of the parent namespace
             // This allows us to work with nested namespaces
-            name = `${parent.name}.${name}`;
+            if (isNamed(parent)) {
+                name = `${parent.name}.${name}`;
+            }        
             parent = parent.$container;
-        }
+        }        
         return name;
     }
 }

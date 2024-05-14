@@ -12,11 +12,11 @@ import {
   isBinding,
   isMeta,
   isTerm,
-  isTermDefinition,
   isRelation,
   isTermRef,
   isApplication,
   NamedOrRefed,
+  isBasicTerm,
 } from '../src/language/generated/ast.js';
 import { createSlartiServices } from '../src/language/slarti-module.js';
 
@@ -38,7 +38,16 @@ export function getNamedElements(
   }
 
   if (isPrinciple(container)) {
-    return [...container.terms, ...container.relations, ...container.applies];
+    return [
+      ...container.terms,
+      ...container.relations,
+      ...container.applies,
+      ...container.requires
+        .map(r => r.principle)
+        .filter(r => r.ref)
+        .map(r => r.ref)
+        .filter(isPrinciple),
+    ];
   }
 
   if (isApply(container)) {
@@ -54,14 +63,10 @@ export function getNamedElements(
   }
 
   if (isTerm(container)) {
-    if (isTermDefinition(container.definition)) {
+    if (container.definition) {
       return getNamedElements(container.definition);
     }
     return [];
-  }
-
-  if (isTermDefinition(container)) {
-    return [container.term.term];
   }
 
   if (isRelation(container)) {
@@ -72,6 +77,9 @@ export function getNamedElements(
     ];
   }
 
+  if (isBasicTerm(container)) {
+    return [container.term];
+  }
   if (isTermRef(container)) {
     return [container.term];
   }
