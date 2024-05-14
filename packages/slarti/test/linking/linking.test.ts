@@ -75,6 +75,27 @@ const tests = [
         P1[test[->T, ->T]]
         P2[P1[test[->T, ->T]]]
     `
+    },
+    {
+        name: 'requiring a principle in a language',
+        code: `
+        language L {
+            token T
+            principle P1 {
+                relation test[T,T]
+            }
+
+            principle P2 {
+                require P1
+            }
+
+            principle P3 {
+                apply P2.P1 {}
+            }
+        }`,
+        expectation: s`
+        L[T, P1[test[->T, ->T]], P2[P1[test[->T, ->T]]], P3[[->P1]]]
+    `
     }
 ]
 

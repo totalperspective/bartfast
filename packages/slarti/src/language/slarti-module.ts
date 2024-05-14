@@ -4,7 +4,7 @@ import type { DefaultSharedModuleContext, LangiumServices, LangiumSharedServices
 import { createDefaultModule, createDefaultSharedModule} from 'langium/lsp';
 import { SlartiGeneratedModule, SlartiGeneratedSharedModule } from './generated/module.js';
 import { SlartiValidator, registerValidationChecks } from './slarti-validator.js';
-import { isApply, isLanguage, isModel, isNamespace, isPrinciple, isSpecification, isToken, Named, Namespace } from './generated/ast.js';
+import { isApply, isLanguage, isModel, isNamespace, isPrinciple, isSpecification, isToken, Named, Namespace, Principle } from './generated/ast.js';
 
 // Scope computation for our C++-like language
 export class SlartiScopeComputation extends DefaultScopeComputation {
@@ -47,8 +47,7 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
         if (isPrinciple(container)) {
             return [
                 ...container.relations, 
-                ...container.terms,
-                ...container.requires.map(r => r.principle).filter(r => r.ref).map(r => r.ref).filter(isPrinciple)
+                ...container.terms
             ]
         }
 
@@ -74,35 +73,47 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
         const localDescriptions: AstNodeDescription[] = [];
         for (const element of this.getNamedElements(container)) {
             if (isNamed(element)) {
+                // console.log({[element.$type]: element.name});
                 // Create a simple local name for the element
                 const description = this.descriptions.createDescription(element, element.name, document);
                 localDescriptions.push(description);
             }
-            if (isNamespace(element)) {
+            if (isNamespace(element) || isModel(element)) {
+                
                 const nestedDescriptions = this.processContainer(element, scopes, document);
                 for (const description of nestedDescriptions) {
                     // Add qualified names to the container
                     // This could also be a partial qualified name
+                    const {node} = description
+                    if (isPrinciple(node)) {
+                        
+                        const root = description.name;
+                        node.requires.forEach(r => {
+                            const name = `${r.principle.$refText}`
+                            const path = `${root}.${name}`;
+                            const principle = this.lookupNode(localDescriptions, name)
+                            if (principle) {
+                                const description = this.descriptions.createDescription(principle, path, document);
+                                localDescriptions.push(description);
+                            }
+                        })
+                    }
                     const qualified = this.createQualifiedDescription(element, description, document);
                     localDescriptions.push(qualified);
                 }
             }
-            if (isPrinciple(element)) {
-                const rootDesc = this.descriptions.createDescription(element, element.name, document);
-                const root = this.getQualifiedName(element, rootDesc.name);
-                element.requires.forEach(r => {
-                    const {ref} = r.principle
-                    if (!ref) {
-                        return
-                    }
-                    const name = `${root}.${ref.name}`;
-                    const description = this.descriptions.createDescription(ref, name, document);
-                    localDescriptions.push(description);
-                })
-            }
         }
         scopes.addAll(container, localDescriptions);
         return localDescriptions;
+    }
+
+    private lookupNode(scope: AstNodeDescription[], name: string) {
+        for (const description of scope) {
+            if (name === description.name) {
+                return description.node
+            }
+        }
+        return undefined
     }
 
     private createQualifiedDescription(
@@ -115,17 +126,21 @@ export class SlartiScopeComputation extends DefaultScopeComputation {
         return this.descriptions.createDescription(description.node!, name, document);
     }
 
-    private getQualifiedName(node: AstNode, name: string): string {
+    private getPath(node: AstNode, name: string) {
+        const path = [name]
         let parent: AstNode | undefined = node.$container;
         while (isAstNode(parent)) {
             // Iteratively prepend the name of the parent namespace
             // This allows us to work with nested namespaces
             if (isNamed(parent)) {
-                name = `${parent.name}.${name}`;
+                path.unshift(parent.name)
             }        
             parent = parent.$container;
-        }        
-        return name;
+        }
+        return path
+    }
+    private getQualifiedName(node: AstNode, name: string): string {
+        return this.getPath(node, name).join('.')
     }
 }
 
